@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs sed -i 's/pink-DEFAULT/pink/g')",
+      "Bash(xargs sed -i 's/#FF1B8D/#D4186C/g; s/FF1B8D44/D4186C44/g; s/FF1B8D88/D4186C88/g; s/FF1B8D66/D4186C66/g; s/FF1B8D33/D4186C33/g; s/FF1B8D22/D4186C22/g; s/FF1B8D11/D4186C11/g')",
+      "Bash(cd /mnt/c/Users/julian/Documents/CasaViboras && ls src/app/ 2>&1)",
+      "Bash(npm run *)"
+    ]
+  }
+}

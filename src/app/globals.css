@@ -1,0 +1,250 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --black: #0a0a0a;
+  --pink: #D4186C;
+  --dark-pink: #A0104F;
+  --hot-pink: #E8005A;
+  --neon-pink: #D4186C;
+  --white: #FAFAFA;
+  --gray: #666666;
+  --font-bebas: 'Bebas Neue', Impact, 'Arial Black', sans-serif;
+  --font-inter: 'Inter', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  background-color: var(--black);
+  color: var(--white);
+  font-family: var(--font-inter);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #111;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--pink);
+  border-radius: 2px;
+}
+
+/* Selección de texto */
+::selection {
+  background: var(--pink);
+  color: var(--black);
+}
+
+/* ============================================================
+   TIPOGRAFÍA
+   ============================================================ */
+.font-title {
+  font-family: var(--font-bebas);
+  letter-spacing: 0.05em;
+}
+
+.text-glow {
+  text-shadow:
+    0 0 10px var(--pink),
+    0 0 20px var(--pink),
+    0 0 40px var(--pink);
+}
+
+.text-glow-sm {
+  text-shadow:
+    0 0 5px var(--pink),
+    0 0 10px var(--pink);
+}
+
+/* ============================================================
+   EFECTOS GRUNGE / TEXTURA
+   ============================================================ */
+.bg-noise::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+
+.grunge-border {
+  border: 1px solid #D4186C44;
+  box-shadow:
+    0 0 0 1px #D4186C11,
+    inset 0 0 30px #D4186C08;
+}
+
+/* ============================================================
+   BOTONES
+   ============================================================ */
+.btn-pink {
+  @apply bg-pink text-black font-bold px-6 py-3 rounded-none uppercase tracking-wider
+         transition-all duration-200
+         hover:bg-pink-hot hover:shadow-neon-pink
+         active:scale-95;
+  font-family: var(--font-bebas);
+  letter-spacing: 0.1em;
+  font-size: 1.1rem;
+}
+
+.btn-outline-pink {
+  @apply border-2 border-pink text-pink font-bold px-6 py-3 rounded-none uppercase tracking-wider
+         bg-transparent transition-all duration-200
+         hover:bg-pink hover:text-black hover:shadow-neon-pink
+         active:scale-95;
+  font-family: var(--font-bebas);
+  letter-spacing: 0.1em;
+  font-size: 1.1rem;
+}
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.card-dark {
+  @apply bg-gray-900 border border-gray-700 rounded-sm;
+}
+
+.card-pink-glow {
+  @apply bg-gray-900 rounded-sm;
+  border: 1px solid #D4186C44;
+  box-shadow:
+    0 0 20px #D4186C11,
+    inset 0 0 30px #D4186C08;
+}
+
+/* ============================================================
+   FLYER / GRUNGE ELEMENTS
+   ============================================================ */
+
+/* Scratch marks — diagonal claw lines */
+.scratch-marks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.scratch-marks::before,
+.scratch-marks::after {
+  content: '';
+  position: absolute;
+  width: 200%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent 0%, #D4186C55 30%, #D4186CAA 50%, #D4186C55 70%, transparent 100%);
+  transform-origin: left center;
+}
+.scratch-marks::before {
+  top: 30%;
+  left: -50%;
+  transform: rotate(-15deg);
+}
+.scratch-marks::after {
+  top: 55%;
+  left: -50%;
+  transform: rotate(-12deg);
+}
+
+/* Thick bordered flyer box */
+.flyer-box {
+  border: 2px solid var(--pink);
+  box-shadow:
+    0 0 0 4px #D4186C22,
+    0 0 20px #D4186C44,
+    inset 0 0 20px #D4186C08;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* Outlined / stroke text (like the poster's "PRESENTA") */
+.text-stroke {
+  -webkit-text-stroke: 2px var(--pink);
+  color: transparent;
+}
+
+/* Corner bracket decorations */
+.corners::before,
+.corners::after {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-color: var(--pink);
+  border-style: solid;
+  opacity: 0.7;
+}
+.corners::before {
+  top: 0; left: 0;
+  border-width: 2px 0 0 2px;
+}
+.corners::after {
+  bottom: 0; right: 0;
+  border-width: 0 2px 2px 0;
+}
+
+/* ============================================================
+   ANIMACIONES ESPECIALES
+   ============================================================ */
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+.scanline {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #D4186C44, transparent);
+  animation: scanline 4s linear infinite;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+@keyframes snake-flicker {
+  0%, 98%, 100% { opacity: 1; }
+  99% { opacity: 0.6; }
+}
+
+.neon-border {
+  border: 1px solid var(--pink);
+  box-shadow:
+    0 0 5px var(--pink),
+    0 0 10px var(--pink),
+    inset 0 0 5px var(--pink);
+  animation: snake-flicker 5s infinite;
+}
+
+/* ============================================================
+   STATUS BADGES
+   ============================================================ */
+.badge-active    { @apply text-green-400 border-green-400 border text-xs px-2 py-0.5 uppercase tracking-wider; font-family: var(--font-bebas); }
+.badge-nominated { @apply text-yellow-400 border-yellow-400 border text-xs px-2 py-0.5 uppercase tracking-wider; font-family: var(--font-bebas); }
+.badge-leader    { @apply text-pink border-pink border text-xs px-2 py-0.5 uppercase tracking-wider; font-family: var(--font-bebas); }
+.badge-eliminated{ @apply text-gray-500 border-gray-500 border text-xs px-2 py-0.5 uppercase tracking-wider; font-family: var(--font-bebas); }
+.badge-saved     { @apply text-blue-400 border-blue-400 border text-xs px-2 py-0.5 uppercase tracking-wider; font-family: var(--font-bebas); }
+
+/* ============================================================
+   MOBILE FIRST — Safe areas
+   ============================================================ */
+.safe-bottom {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+.safe-top {
+  padding-top: max(1rem, env(safe-area-inset-top));
+}
