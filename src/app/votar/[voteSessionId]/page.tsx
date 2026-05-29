@@ -40,15 +40,14 @@ export default async function VotarSessionPage({ params }: Props) {
     redirect('/votar')
   }
 
-  // Verificar si ya votó
-  const { data: existingVote } = await supabase
+  // Verificar si ya votó (count para compatibilidad con multi-vote)
+  const { count: voteCount } = await supabase
     .from('votes')
-    .select('id')
+    .select('id', { count: 'exact', head: true })
     .eq('vote_session_id', voteSessionId)
     .eq('voter_id', profile.id)
-    .single()
 
-  const hasVoted = !!existingVote
+  const hasVoted = (voteCount ?? 0) > 0
 
   // Si es votación de jugadoras, verificar que sea jugadora
   if (session.voter_type === 'players' && profile.role !== 'player' && profile.role !== 'admin') {

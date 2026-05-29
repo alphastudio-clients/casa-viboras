@@ -17,8 +17,7 @@ import type { VoteSession, Season, VoteType, VoterType, VoteSessionStatus } from
 const VOTE_TYPES: VoteType[] = [
   'public_negative', 'public_positive',
   'internal_nomination', 'internal_spontaneous',
-  'internal_fulminating', 'internal_leader',
-  'internal_positive', 'internal_negative',
+  'internal_leader', 'internal_positive', 'internal_negative',
 ]
 
 const statusColor: Record<VoteSessionStatus, string> = {

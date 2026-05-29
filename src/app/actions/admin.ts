@@ -385,42 +385,70 @@ export async function getVoteResults(sessionId: string) {
   await requireAdmin()
   const supabase = await createAdminClient()
 
-  // Conteo de votos por jugador
+  // Traer votos con puntos
   const { data: votes } = await supabase
     .from('votes')
-    .select('target_player_id, voter:profiles(display_name, email), created_at, reason')
+    .select('target_player_id, voter_id, voter:profiles(display_name, email), created_at, reason, points, rank')
     .eq('vote_session_id', sessionId)
-    .order('created_at', { ascending: false })
+    .order('rank', { ascending: true })
 
-  if (!votes) return { votes: [], counts: [] }
+  if (!votes) return { votes: [], counts: [], total: 0, uniqueVoters: 0 }
 
-  // Agrupar por jugador
-  const countMap = new Map<string, number>()
+  // Sumar puntos por jugador (weighted)
+  const pointsMap = new Map<string, number>()
   for (const v of votes) {
     const pid = v.target_player_id
-    countMap.set(pid, (countMap.get(pid) ?? 0) + 1)
+    const pts = (v as { points?: number }).points ?? 1
+    pointsMap.set(pid, (pointsMap.get(pid) ?? 0) + pts)
   }
 
-  // Obtener nombres
-  const playerIds = Array.from(countMap.keys())
+  // Votantes únicos
+  const uniqueVoters = new Set(votes.map((v) => v.voter_id)).size
+
+  // Total de puntos para porcentaje
+  const totalPoints = Array.from(pointsMap.values()).reduce((a, b) => a + b, 0)
+
+  // Obtener jugadoras
+  const playerIds = Array.from(pointsMap.keys())
   const { data: players } = await supabase
     .from('players')
     .select('id, name, photo_url, nickname')
     .in('id', playerIds)
 
-  const totalVotes = votes.length
   const counts = (players ?? [])
     .map((p) => ({
       player_id: p.id,
       player_name: p.name,
       player_nickname: p.nickname,
       photo_url: p.photo_url,
-      vote_count: countMap.get(p.id) ?? 0,
-      percentage: totalVotes > 0 ? Math.round(((countMap.get(p.id) ?? 0) / totalVotes) * 100) : 0,
+      vote_count: pointsMap.get(p.id) ?? 0,
+      percentage: totalPoints > 0 ? Math.round(((pointsMap.get(p.id) ?? 0) / totalPoints) * 100) : 0,
     }))
     .sort((a, b) => b.vote_count - a.vote_count)
 
-  return { votes, counts, total: totalVotes }
+  return { votes, counts, total: uniqueVoters, uniqueVoters }
+}
+
+export async function setTopNominated(sessionId: string, n: number = 4) {
+  await requireAdmin()
+  const supabase = await createAdminClient()
+
+  const { counts } = await getVoteResults(sessionId)
+  const topN = counts.slice(0, n).map((c) => c.player_id)
+
+  if (topN.length === 0) return { error: 'No hay votos registrados.' }
+
+  const { error } = await supabase
+    .from('players')
+    .update({ status: 'nominated' })
+    .in('id', topN)
+
+  if (error) return { error: error.message }
+
+  revalidatePath('/admin/jugadores')
+  revalidatePath('/casa')
+  revalidatePath('/jugadores')
+  return { success: true, playerIds: topN }
 }
 
 // ============================================================

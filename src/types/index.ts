@@ -10,7 +10,6 @@ export type VoteType =
   | 'public_positive'
   | 'internal_nomination'
   | 'internal_spontaneous'
-  | 'internal_fulminating'
   | 'internal_leader'
   | 'internal_positive'
   | 'internal_negative'
@@ -120,6 +119,8 @@ export interface Vote {
   vote_session_id: string
   voter_id: string
   target_player_id: string
+  points: number
+  rank: number
   reason: string | null
   created_at: string
   // joins
@@ -206,6 +207,29 @@ export interface CastVoteInput {
   reason?: string
 }
 
+export interface CastMultiVoteInput {
+  vote_session_id: string
+  picks: string[]   // ordered player IDs: picks[0] = 1st choice, picks[1] = 2nd, etc.
+  reason?: string
+}
+
+// ============================================================
+// MULTI-VOTE CONFIG
+// ============================================================
+
+/**
+ * Types that require selecting multiple players with weighted points.
+ * Key = vote type, Value = array of points per rank (index 0 = 1st pick, etc.)
+ */
+export const VOTE_WEIGHTS: Partial<Record<VoteType, number[]>> = {
+  internal_nomination: [2, 1],      // 2 picks: 1st = 2pts, 2nd = 1pt
+  internal_spontaneous: [3, 2, 1],  // 3 picks: 1st = 3pts, 2nd = 2pts, 3rd = 1pt
+}
+
+export function isMultiVoteType(type: VoteType): boolean {
+  return type in VOTE_WEIGHTS
+}
+
 // ============================================================
 // UI HELPERS
 // ============================================================
@@ -215,7 +239,6 @@ export const VOTE_TYPE_LABELS: Record<VoteType, string> = {
   public_positive: 'Quién querés que se quede',
   internal_nomination: 'Nominación',
   internal_spontaneous: 'Nominación Espontánea',
-  internal_fulminating: 'Fulminante',
   internal_leader: 'Liderazgo',
   internal_positive: 'Placa Positiva',
   internal_negative: 'Placa Negativa',
