@@ -239,7 +239,7 @@ export function IntroAnimation() {
                   }}
                   transition={{ duration: 2, repeat: Infinity }}
                   whileTap={{ scale: 0.96 }}
-                  whileHover={{ background: '#E8005A' } as object}
+                  whileHover={{ backgroundColor: '#E8005A' }}
                 >
                   ENTRAR A LA CASA
                 </motion.button>
