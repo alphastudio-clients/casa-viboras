@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { getProfile } from '@/lib/auth/utils'
+import { getUser, getProfile } from '@/lib/auth/utils'
 import { Header } from '@/components/layout/Header'
 import { VoteForm } from '@/components/voting/VoteForm'
 import { VOTE_TYPE_LABELS } from '@/types'
@@ -16,12 +16,15 @@ interface Props {
 export default async function VotarSessionPage({ params }: Props) {
   const { voteSessionId } = await params
   const supabase = await createClient()
-  const profile = await getProfile()
 
-  // Redirigir a login si no está autenticado
-  if (!profile) {
+  // Necesitamos usuario (anónimo o autenticado), no necesariamente perfil
+  const user = await getUser()
+  if (!user) {
     redirect(`/login?redirectTo=/votar/${voteSessionId}`)
   }
+
+  // Perfil puede ser null para usuarios anónimos
+  const profile = await getProfile()
 
   // Obtener sesión de votación
   const { data: session } = await supabase
@@ -40,32 +43,45 @@ export default async function VotarSessionPage({ params }: Props) {
     redirect('/votar')
   }
 
-  // Verificar si ya votó (count para compatibilidad con multi-vote)
+  // Si es votación de jugadoras, verificar que sea jugadora con cuenta vinculada
+  if (session.voter_type === 'players') {
+    if (!profile || (profile.role !== 'player' && profile.role !== 'admin')) {
+      return (
+        <div className="min-h-screen bg-black">
+          <Header profile={profile} />
+          <main className="pt-14 px-4">
+            <div className="max-w-screen-sm mx-auto py-20 text-center">
+              <span className="text-5xl block mb-4">🐍</span>
+              <h2 className="font-title text-2xl text-white mb-2">
+                Esta votación es solo para jugadoras
+              </h2>
+              <p className="text-gray-500 text-sm mb-6">
+                Necesitás ingresar con la cuenta de Google vinculada a tu perfil de jugadora.
+              </p>
+              <a
+                href={`/login?redirectTo=/votar/${voteSessionId}`}
+                className="inline-block font-title text-sm tracking-widest uppercase px-6 py-3"
+                style={{ background: '#D4186C', color: 'black' }}
+              >
+                Ingresar con Google
+              </a>
+            </div>
+          </main>
+        </div>
+      )
+    }
+  }
+
+  // Verificar si ya votó (usando user.id directamente, funciona para anónimos y autenticados)
   const { count: voteCount } = await supabase
     .from('votes')
     .select('id', { count: 'exact', head: true })
     .eq('vote_session_id', voteSessionId)
-    .eq('voter_id', profile.id)
+    .eq('voter_id', user.id)
 
   const hasVoted = (voteCount ?? 0) > 0
 
-  // Si es votación de jugadoras, verificar que sea jugadora
-  if (session.voter_type === 'players' && profile.role !== 'player' && profile.role !== 'admin') {
-    return (
-      <div className="min-h-screen bg-black">
-        <Header profile={profile} />
-        <main className="pt-14 px-4">
-          <div className="max-w-screen-sm mx-auto py-20 text-center">
-            <span className="text-5xl block mb-4">🐍</span>
-            <h2 className="font-title text-2xl text-white mb-2">Esta votación es solo para jugadoras</h2>
-            <p className="text-gray-500 text-sm">Contactá al admin si creés que es un error.</p>
-          </div>
-        </main>
-      </div>
-    )
-  }
-
-  // Obtener jugadoras en placa (o todas según tipo)
+  // Obtener jugadoras
   let playersQuery = supabase
     .from('players')
     .select('*')
@@ -93,9 +109,9 @@ export default async function VotarSessionPage({ params }: Props) {
 
   const { data: players } = await playersQuery
 
-  // Excluir al jugador votante (si es jugadora)
+  // Excluir al jugador votante (si tiene perfil y está vinculada)
   const filteredPlayers = (players ?? []).filter((p: Player) =>
-    p.profile_id !== profile.id
+    !profile || p.profile_id !== profile.id
   )
 
   return (

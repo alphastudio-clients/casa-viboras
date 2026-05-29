@@ -14,7 +14,7 @@ import type { Player, VoteSession, Profile } from '@/types'
 interface VoteFormProps {
   session: VoteSession
   players: Player[]
-  profile: Profile
+  profile: Profile | null   // null para usuarios anónimos
   hasVoted: boolean
 }
 

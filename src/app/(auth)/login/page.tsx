@@ -9,15 +9,15 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 function LoginCard() {
-  const [loading, setLoading] = useState<'google' | 'instagram' | null>(null)
+  const [loading, setLoading] = useState<'google' | 'anon' | null>(null)
   const [error, setError] = useState<string | null>(null)
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirectTo') ?? '/'
+  const redirectTo = searchParams.get('redirectTo') ?? '/votar'
   const hasError = searchParams.get('error')
 
-  async function handleOAuthLogin(provider: 'google' | 'instagram') {
+  async function handleGoogleLogin() {
     try {
-      setLoading(provider)
+      setLoading('google')
       setError(null)
       const supabase = createClient()
 
@@ -25,12 +25,10 @@ function LoginCard() {
       callbackUrl.searchParams.set('next', redirectTo)
 
       const { data, error } = await supabase.auth.signInWithOAuth({
-        provider,
+        provider: 'google',
         options: {
           redirectTo: callbackUrl.toString(),
-          ...(provider === 'google' && {
-            queryParams: { access_type: 'offline', prompt: 'consent' },
-          }),
+          queryParams: { access_type: 'offline', prompt: 'consent' },
         },
       })
 
@@ -38,6 +36,20 @@ function LoginCard() {
       if (data.url) window.location.href = data.url
     } catch {
       setError('No se pudo iniciar sesión. Intentá de nuevo.')
+      setLoading(null)
+    }
+  }
+
+  async function handleAnonVote() {
+    try {
+      setLoading('anon')
+      setError(null)
+      const supabase = createClient()
+      const { error } = await supabase.auth.signInAnonymously()
+      if (error) throw error
+      window.location.href = redirectTo
+    } catch {
+      setError('No se pudo continuar. Intentá de nuevo.')
       setLoading(null)
     }
   }
@@ -103,34 +115,51 @@ function LoginCard() {
         )}
 
         <div className="flex flex-col gap-3">
-          {/* Instagram Login */}
-          <Button
-            onClick={() => handleOAuthLogin('instagram')}
-            loading={loading === 'instagram'}
+
+          {/* ── Votación pública: sin cuenta ── */}
+          <motion.button
+            type="button"
+            onClick={handleAnonVote}
             disabled={loading !== null}
-            size="lg"
-            className="w-full font-title tracking-widest text-white"
+            whileTap={{ scale: 0.97 }}
+            animate={{
+              boxShadow: loading === 'anon'
+                ? ['0 0 20px #D4186C88', '0 0 40px #D4186C', '0 0 20px #D4186C88']
+                : ['0 0 12px #D4186C44', '0 0 24px #D4186C66', '0 0 12px #D4186C44'],
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="w-full py-4 font-title text-xl tracking-[0.2em] uppercase text-black disabled:opacity-60 flex items-center justify-center gap-3"
             style={{
-              background: 'linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%)',
-              border: 'none',
+              background: '#D4186C',
+              clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)',
             }}
           >
-            <svg className="w-5 h-5 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-            </svg>
-            Continuar con Instagram
-          </Button>
+            {loading === 'anon' ? (
+              <span className="w-5 h-5 border-2 border-black/40 border-t-black rounded-full animate-spin" />
+            ) : (
+              <>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Votar sin cuenta
+              </>
+            )}
+          </motion.button>
 
-          {/* Divider */}
-          <div className="flex items-center gap-3">
+          <p className="text-gray-600 text-xs text-center -mt-1 leading-relaxed">
+            Para votaciones públicas · Sin registro
+          </p>
+
+          {/* Separador */}
+          <div className="flex items-center gap-3 my-1">
             <div className="flex-1 h-px bg-gray-800" />
-            <span className="text-gray-700 text-xs">o</span>
+            <span className="text-gray-700 text-xs uppercase tracking-wider">Si sos jugadora</span>
             <div className="flex-1 h-px bg-gray-800" />
           </div>
 
-          {/* Google Login */}
+          {/* ── Google (jugadoras / admin) ── */}
           <Button
-            onClick={() => handleOAuthLogin('google')}
+            onClick={handleGoogleLogin}
             loading={loading === 'google'}
             disabled={loading !== null}
             variant="outline"
@@ -145,10 +174,13 @@ function LoginCard() {
             </svg>
             Continuar con Google
           </Button>
+
+          <p className="text-gray-700 text-xs text-center -mt-1">
+            Para votaciones internas del equipo
+          </p>
         </div>
 
         <p className="text-center text-gray-600 text-xs mt-6 leading-relaxed">
-          Al ingresar aceptás que tus datos se usen para registrar tu voto.
           Un voto por votación activa.
         </p>
       </div>
@@ -165,7 +197,6 @@ function LoginCard() {
 export default function LoginPage() {
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center px-4 relative overflow-hidden">
-      {/* Background */}
       <div className="absolute inset-0 bg-gradient-radial from-pink/5 via-transparent to-transparent" />
       <div
         className="absolute inset-0 opacity-5"
@@ -173,8 +204,6 @@ export default function LoginPage() {
           backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(212,24,108,0.15) 2px, rgba(212,24,108,0.15) 4px)',
         }}
       />
-
-      {/* Corner decorations */}
       <div className="absolute top-0 left-0 w-12 h-12 border-t-2 border-l-2 border-pink/40" />
       <div className="absolute top-0 right-0 w-12 h-12 border-t-2 border-r-2 border-pink/40" />
       <div className="absolute bottom-0 left-0 w-12 h-12 border-b-2 border-l-2 border-pink/40" />
