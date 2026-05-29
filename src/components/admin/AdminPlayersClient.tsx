@@ -12,6 +12,7 @@ import {
   deletePlayer,
   uploadPlayerPhoto,
   linkPlayerToProfile,
+  linkPlayerByEmail,
 } from '@/app/actions/admin'
 import { getInitials } from '@/lib/utils'
 import type { Player, Season, PlayerStatus, Profile } from '@/types'
@@ -56,6 +57,9 @@ export function AdminPlayersClient({ players: initial, seasons, profiles }: Prop
   const [editData, setEditData] = useState<EditData>({
     name: '', nickname: '', description: '', highlight_phrase: '', instagram_handle: '',
   })
+  const [emailInput, setEmailInput] = useState('')
+  const [emailError, setEmailError] = useState<string | null>(null)
+  const [emailSuccess, setEmailSuccess] = useState<string | null>(null)
   const [uploadingId, setUploadingId] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -77,6 +81,9 @@ export function AdminPlayersClient({ players: initial, seasons, profiles }: Prop
       highlight_phrase: player.highlight_phrase ?? '',
       instagram_handle: player.instagram_handle ?? '',
     })
+    setEmailInput('')
+    setEmailError(null)
+    setEmailSuccess(null)
   }
 
   function cancelEdit() { setEditingId(null) }
@@ -108,6 +115,27 @@ export function AdminPlayersClient({ players: initial, seasons, profiles }: Prop
         setPlayers(prev => prev.map(p =>
           p.id === playerId ? { ...p, profile_id: profileId || null } : p
         ))
+      }
+    })
+  }
+
+  // ── VINCULAR POR EMAIL ───────────────────────────────────
+  async function handleLinkByEmail(playerId: string) {
+    if (!emailInput.trim()) return
+    setEmailError(null)
+    setEmailSuccess(null)
+    startTransition(async () => {
+      const result = await linkPlayerByEmail(playerId, emailInput.trim())
+      if (result.error) {
+        setEmailError(result.error)
+      } else {
+        setEmailSuccess(`Vinculada correctamente a ${emailInput.trim()}`)
+        setEmailInput('')
+        if (result.profileId) {
+          setPlayers(prev => prev.map(p =>
+            p.id === playerId ? { ...p, profile_id: result.profileId! } : p
+          ))
+        }
       }
     })
   }
@@ -404,9 +432,49 @@ export function AdminPlayersClient({ players: initial, seasons, profiles }: Prop
                     {/* Vincular usuaria */}
                     <div className="mb-4 p-3" style={{ background: '#111', border: '1px solid #2a2a2a' }}>
                       <p className="text-xs text-gray-600 uppercase tracking-wider mb-2">Vincular cuenta de usuaria</p>
-                      <p className="text-gray-600 text-xs mb-3 leading-relaxed">
-                        Seleccioná qué usuaria (que haya iniciado sesión con Google) corresponde a esta jugadora. Esto le da acceso a las votaciones internas.
-                      </p>
+
+                      {/* Vinculación por email (automática) */}
+                      <div className="mb-3">
+                        <p className="text-gray-500 text-xs mb-2">
+                          Ingresá el email de Gmail con el que la jugadora inicia sesión:
+                        </p>
+                        <div className="flex gap-2">
+                          <input
+                            type="email"
+                            value={editingId === player.id ? emailInput : ''}
+                            onChange={e => setEmailInput(e.target.value)}
+                            onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleLinkByEmail(player.id))}
+                            placeholder="jugadora@gmail.com"
+                            className={`${INPUT_CLS} flex-1`}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleLinkByEmail(player.id)}
+                            disabled={isPending || !emailInput.trim()}
+                            className="font-title text-xs tracking-wider uppercase px-3 py-2 flex-shrink-0 transition-colors disabled:opacity-40"
+                            style={{ border: '1px solid #D4186C', color: '#D4186C', background: 'transparent' }}
+                          >
+                            Vincular
+                          </button>
+                        </div>
+                        {emailError && (
+                          <p className="text-red-400 text-xs mt-1.5">{emailError}</p>
+                        )}
+                        {emailSuccess && (
+                          <p className="text-green-400 text-xs mt-1.5 flex items-center gap-1">
+                            <Check size={10} /> {emailSuccess}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Separador */}
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="flex-1 h-px bg-gray-800" />
+                        <span className="text-gray-700 text-xs uppercase tracking-wider">o elegí de la lista</span>
+                        <div className="flex-1 h-px bg-gray-800" />
+                      </div>
+
+                      {/* Selector dropdown */}
                       <select
                         value={player.profile_id ?? ''}
                         onChange={e => handleLink(player.id, e.target.value)}

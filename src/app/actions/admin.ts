@@ -8,6 +8,8 @@ import type {
   CreatePlayerInput,
   CreateVoteSessionInput,
   VoteSessionStatus,
+  VoteType,
+  VoterType,
 } from '@/types'
 
 // ============================================================
@@ -147,6 +149,50 @@ export async function linkPlayerToProfile(playerId: string, profileId: string | 
   return { success: true }
 }
 
+export async function linkPlayerByEmail(playerId: string, email: string) {
+  await requireAdmin()
+  const supabase = await createAdminClient()
+
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('id, player_id')
+    .eq('email', email.trim().toLowerCase())
+    .single()
+
+  if (profileError || !profile) {
+    return { error: 'No se encontró ninguna usuaria con ese email. Debe haber iniciado sesión al menos una vez.' }
+  }
+
+  // Si la profile ya está vinculada a otra jugadora, desvinculamos
+  const { data: player } = await supabase
+    .from('players')
+    .select('profile_id')
+    .eq('id', playerId)
+    .single()
+
+  if (player?.profile_id && player.profile_id !== profile.id) {
+    await supabase
+      .from('profiles')
+      .update({ role: 'public', player_id: null })
+      .eq('id', player.profile_id)
+  }
+
+  const { error } = await supabase
+    .from('players')
+    .update({ profile_id: profile.id })
+    .eq('id', playerId)
+
+  if (error) return { error: error.message }
+
+  await supabase
+    .from('profiles')
+    .update({ role: 'player', player_id: playerId })
+    .eq('id', profile.id)
+
+  revalidatePath('/admin/jugadores')
+  return { success: true, profileId: profile.id }
+}
+
 export async function updatePlayerStatus(playerId: string, status: PlayerStatus) {
   await requireAdmin()
   const supabase = await createAdminClient()
@@ -244,6 +290,34 @@ export async function createVoteSession(input: CreateVoteSessionInput) {
   if (error) return { error: error.message }
   revalidatePath('/admin/votaciones')
   return { session }
+}
+
+export async function updateVoteSession(
+  sessionId: string,
+  data: {
+    title?: string
+    description?: string
+    type?: VoteType
+    voter_type?: VoterType
+  }
+) {
+  await requireAdmin()
+  const supabase = await createAdminClient()
+
+  const { error } = await supabase
+    .from('vote_sessions')
+    .update({
+      title: data.title,
+      description: data.description || null,
+      type: data.type,
+      voter_type: data.voter_type,
+    })
+    .eq('id', sessionId)
+
+  if (error) return { error: error.message }
+  revalidatePath('/admin/votaciones')
+  revalidatePath('/votar')
+  return { success: true }
 }
 
 export async function updateVoteSessionStatus(sessionId: string, status: VoteSessionStatus) {
