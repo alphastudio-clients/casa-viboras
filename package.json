@@ -10,31 +10,31 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "next": "15.1.0",
+    "@hookform/resolvers": "^3.9.1",
+    "@supabase/ssr": "^0.5.1",
+    "@supabase/supabase-js": "^2.46.1",
+    "@tanstack/react-query": "^5.60.5",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.11.0",
+    "lucide-react": "^0.462.0",
+    "next": "^16.2.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "@supabase/supabase-js": "^2.46.1",
-    "@supabase/ssr": "^0.5.1",
-    "framer-motion": "^11.11.0",
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^2.5.4",
-    "lucide-react": "^0.462.0",
-    "sonner": "^1.7.1",
-    "zustand": "^5.0.1",
-    "@tanstack/react-query": "^5.60.5",
     "react-hook-form": "^7.53.2",
+    "sonner": "^1.7.1",
+    "tailwind-merge": "^2.5.4",
     "zod": "^3.23.8",
-    "@hookform/resolvers": "^3.9.1"
+    "zustand": "^5.0.1"
   },
   "devDependencies": {
-    "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "tailwindcss": "^3.4.14",
-    "postcss": "^8",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
-    "eslint-config-next": "15.1.0"
+    "eslint-config-next": "15.1.0",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.14",
+    "typescript": "^5"
   }
 }
