@@ -2,12 +2,14 @@
 
 import { useState, useTransition } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, X, Play, Square, Eye, RotateCcw, Pencil, Check } from 'lucide-react'
+import { Plus, X, Play, Square, Eye, RotateCcw, Pencil, Check, BarChart2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import Image from 'next/image'
 import {
   createVoteSession,
   updateVoteSession,
   updateVoteSessionStatus,
+  getVoteResults,
 } from '@/app/actions/admin'
 import { VOTE_TYPE_LABELS } from '@/types'
 import type { VoteSession, Season, VoteType, VoterType, VoteSessionStatus } from '@/types'
@@ -40,6 +42,15 @@ interface EditSessionData {
   voter_type: VoterType
 }
 
+interface VoteCount {
+  player_id: string
+  player_name: string
+  player_nickname: string | null
+  photo_url: string | null
+  vote_count: number
+  percentage: number
+}
+
 interface Props {
   sessions: (VoteSession & { season?: { name: string } })[]
   seasons: Season[]
@@ -55,6 +66,9 @@ export function AdminVotacionesClient({ sessions: initial, seasons }: Props) {
   const [editSession, setEditSession] = useState<EditSessionData>({
     title: '', description: '', type: 'public_negative', voter_type: 'public',
   })
+  const [statsId, setStatsId] = useState<string | null>(null)
+  const [statsData, setStatsData] = useState<Record<string, { counts: VoteCount[]; total: number }>>({})
+  const [statsLoading, setStatsLoading] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [editError, setEditError] = useState<string | null>(null)
@@ -112,6 +126,20 @@ export function AdminVotacionesClient({ sessions: initial, seasons }: Props) {
         setEditingId(null)
       }
     })
+  }
+
+  // ── STATS ────────────────────────────────────────────────
+  async function toggleStats(sessionId: string) {
+    if (statsId === sessionId) { setStatsId(null); return }
+    setStatsId(sessionId)
+    if (statsData[sessionId]) return // ya cargado
+    setStatsLoading(sessionId)
+    const data = await getVoteResults(sessionId)
+    setStatsData((prev) => ({
+      ...prev,
+      [sessionId]: { counts: data.counts as VoteCount[], total: data.total ?? 0 },
+    }))
+    setStatsLoading(null)
   }
 
   // ── CAMBIAR ESTADO ───────────────────────────────────────
@@ -283,6 +311,18 @@ export function AdminVotacionesClient({ sessions: initial, seasons }: Props) {
                       </button>
                     )}
 
+                    {/* Botón stats */}
+                    <button
+                      onClick={() => toggleStats(s.id)}
+                      className={`p-1.5 rounded transition-colors ${statsId === s.id ? 'text-pink' : 'text-gray-600 hover:text-white'}`}
+                      title="Ver porcentajes"
+                    >
+                      {statsLoading === s.id
+                        ? <span className="w-3 h-3 border-2 border-pink/40 border-t-pink rounded-full animate-spin block" />
+                        : <BarChart2 size={13} />
+                      }
+                    </button>
+
                     {/* Botón editar */}
                     <button
                       onClick={() => editingId === s.id ? cancelEdit() : startEdit(s)}
@@ -294,6 +334,104 @@ export function AdminVotacionesClient({ sessions: initial, seasons }: Props) {
                   </div>
                 </div>
               </div>
+
+              {/* Panel de estadísticas */}
+              <AnimatePresence>
+                {statsId === s.id && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div
+                      className="px-4 py-3 border-x border-b"
+                      style={{ background: '#080010', borderColor: '#D4186C22' }}
+                    >
+                      {statsLoading === s.id ? (
+                        <div className="flex items-center gap-2 py-2 text-gray-600 text-xs">
+                          <span className="w-3 h-3 border-2 border-pink/40 border-t-pink rounded-full animate-spin" />
+                          Cargando votos...
+                        </div>
+                      ) : statsData[s.id] ? (
+                        <>
+                          <div className="flex items-center justify-between mb-3">
+                            <p className="font-title text-xs tracking-[0.25em] uppercase" style={{ color: '#D4186C88' }}>
+                              Resultados en vivo
+                            </p>
+                            <p className="text-gray-600 text-xs">
+                              {statsData[s.id].total} {statsData[s.id].total === 1 ? 'voto' : 'votos'} totales
+                            </p>
+                          </div>
+
+                          {statsData[s.id].counts.length === 0 ? (
+                            <p className="text-gray-700 text-sm text-center py-2">Sin votos todavía</p>
+                          ) : (
+                            <div className="space-y-2.5">
+                              {statsData[s.id].counts.map((c, i) => (
+                                <div key={c.player_id} className="flex items-center gap-3">
+                                  {/* Foto */}
+                                  <div className="w-7 h-8 bg-gray-900 flex-shrink-0 overflow-hidden relative rounded-sm">
+                                    {c.photo_url ? (
+                                      <Image src={c.photo_url} alt={c.player_name} fill className="object-cover object-top" sizes="28px" />
+                                    ) : (
+                                      <div className="w-full h-full flex items-center justify-center">
+                                        <span className="font-title text-[8px]" style={{ color: '#D4186C66' }}>
+                                          {c.player_name.charAt(0)}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                  {/* Barra */}
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between mb-1">
+                                      <span className="text-xs text-white truncate">
+                                        {c.player_nickname ? `${c.player_name} "${c.player_nickname}"` : c.player_name}
+                                      </span>
+                                      <span className="text-xs font-title ml-2 flex-shrink-0" style={{ color: i === 0 ? '#D4186C' : '#666' }}>
+                                        {c.percentage}%
+                                        <span className="text-gray-700 font-sans ml-1">({c.vote_count})</span>
+                                      </span>
+                                    </div>
+                                    <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                                      <motion.div
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${c.percentage}%` }}
+                                        transition={{ duration: 0.5, delay: i * 0.08 }}
+                                        className="h-full rounded-full"
+                                        style={{
+                                          background: i === 0 ? '#D4186C' : '#333',
+                                          boxShadow: i === 0 ? '0 0 6px #D4186C88' : 'none',
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Botón refrescar */}
+                          <button
+                            onClick={async () => {
+                              setStatsLoading(s.id)
+                              const data = await getVoteResults(s.id)
+                              setStatsData((prev) => ({
+                                ...prev,
+                                [s.id]: { counts: data.counts as VoteCount[], total: data.total ?? 0 },
+                              }))
+                              setStatsLoading(null)
+                            }}
+                            className="mt-3 text-gray-700 hover:text-gray-500 text-xs flex items-center gap-1 transition-colors"
+                          >
+                            <RotateCcw size={10} /> Actualizar
+                          </button>
+                        </>
+                      ) : null}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Panel de edición expandible */}
               <AnimatePresence>
