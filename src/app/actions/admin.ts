@@ -155,15 +155,15 @@ export async function linkPlayerByEmail(playerId: string, email: string) {
 
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('id, player_id')
+    .select('id, role, player_id')
     .eq('email', email.trim().toLowerCase())
     .single()
 
   if (profileError || !profile) {
-    return { error: 'No se encontró ninguna usuaria con ese email. Debe haber iniciado sesión al menos una vez.' }
+    return { error: 'No se encontró ningún usuario con ese email. Debe haber iniciado sesión al menos una vez.' }
   }
 
-  // Si la profile ya está vinculada a otra jugadora, desvinculamos
+  // Si la profile ya está vinculada a otra jugadora, desvinculamos (sin tocar admins)
   const { data: player } = await supabase
     .from('players')
     .select('profile_id')
@@ -171,10 +171,18 @@ export async function linkPlayerByEmail(playerId: string, email: string) {
     .single()
 
   if (player?.profile_id && player.profile_id !== profile.id) {
-    await supabase
+    const { data: oldProfile } = await supabase
       .from('profiles')
-      .update({ role: 'public', player_id: null })
+      .select('role')
       .eq('id', player.profile_id)
+      .single()
+    // Solo resetear si no es admin
+    if (oldProfile?.role !== 'admin') {
+      await supabase
+        .from('profiles')
+        .update({ role: 'public', player_id: null })
+        .eq('id', player.profile_id)
+    }
   }
 
   const { error } = await supabase
@@ -184,9 +192,11 @@ export async function linkPlayerByEmail(playerId: string, email: string) {
 
   if (error) return { error: error.message }
 
+  // No bajar el rol si ya es admin
+  const newRole = profile.role === 'admin' ? 'admin' : 'player'
   await supabase
     .from('profiles')
-    .update({ role: 'player', player_id: playerId })
+    .update({ role: newRole, player_id: playerId })
     .eq('id', profile.id)
 
   revalidatePath('/admin/jugadores')

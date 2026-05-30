@@ -15,13 +15,21 @@ export async function getProfile(): Promise<Profile | null> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
-  const { data } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single()
+  const adminClient = await createAdminClient()
 
-  return data
+  const [{ data: profile }, { data: adminUser }] = await Promise.all([
+    adminClient.from('profiles').select('*').eq('id', user.id).single(),
+    adminClient.from('admin_users').select('id').eq('email', user.email ?? '').single(),
+  ])
+
+  if (!profile) return null
+
+  // Si está en admin_users, forzar role admin en el objeto devuelto
+  if (adminUser && profile.role !== 'admin') {
+    return { ...profile, role: 'admin' as const }
+  }
+
+  return profile
 }
 
 export async function requireAuth() {
