@@ -21,6 +21,9 @@ function LoginCard() {
       setError(null)
       const supabase = createClient()
 
+      // Cerrar sesión anónima antes de Google OAuth para evitar conflictos
+      await supabase.auth.signOut()
+
       const callbackUrl = new URL('/auth/callback', window.location.origin)
       callbackUrl.searchParams.set('next', redirectTo)
 
