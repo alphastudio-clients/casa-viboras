@@ -22,14 +22,24 @@ export async function getProfile(): Promise<Profile | null> {
     adminClient.from('admin_users').select('id').eq('email', user.email ?? '').single(),
   ])
 
-  if (!profile) return null
-
-  // Si está en admin_users, forzar role admin en el objeto devuelto
-  if (adminUser && profile.role !== 'admin') {
-    return { ...profile, role: 'admin' as const }
+  // Si está en admin_users, siempre retornar perfil con role admin
+  if (adminUser) {
+    if (profile) return { ...profile, role: 'admin' as const }
+    // Sin perfil todavía: construir uno mínimo para que funcione el Header
+    return {
+      id: user.id,
+      email: user.email ?? null,
+      display_name: user.email ?? null,
+      avatar_url: null,
+      instagram_handle: null,
+      role: 'admin',
+      player_id: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } satisfies Profile
   }
 
-  return profile
+  return profile ?? null
 }
 
 export async function requireAuth() {
