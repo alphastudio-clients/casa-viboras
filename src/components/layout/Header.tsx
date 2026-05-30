@@ -73,11 +73,16 @@ export function Header({ profile }: HeaderProps) {
             </Link>
           )}
           {profile ? (
-            <form action="/auth/signout" method="post">
-              <button className="font-title text-xs tracking-wider text-gray-500 hover:text-white uppercase transition-colors">
-                Salir
-              </button>
-            </form>
+            <div className="flex items-center gap-3">
+              <span className="text-gray-700 text-xs hidden lg:block truncate max-w-[160px]" title={profile.email ?? ''}>
+                {profile.email ?? profile.display_name ?? ''}
+              </span>
+              <form action="/auth/signout" method="post">
+                <button className="font-title text-xs tracking-wider text-gray-500 hover:text-white uppercase transition-colors">
+                  Salir
+                </button>
+              </form>
+            </div>
           ) : (
             <Link
               href="/login"
