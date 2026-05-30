@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import { getProfile } from '@/lib/auth/utils'
 import { Header } from '@/components/layout/Header'
@@ -52,17 +53,25 @@ export default async function JugadorasPage() {
                   color: 'white',
                 }}
               >
-                LAS JUGADORAS
+                LES JUGADORES
               </h1>
               <p className="text-gray-600 text-xs mt-2 tracking-widest uppercase">
-                {all.length} jugadoras · {eliminated.length} eliminadas
+                {all.length} jugadores · {eliminated.length} eliminados
               </p>
             </div>
           </div>
 
           {!season && (
             <div className="text-center py-20 text-gray-700">
-              <span className="text-5xl block mb-3">🐍</span>
+              <div className="flex justify-center mb-3">
+                <Image
+                  src="/logo-viboras.png"
+                  alt=""
+                  width={64}
+                  height={64}
+                  style={{ filter: 'drop-shadow(0 0 20px #D4186C88)' }}
+                />
+              </div>
               <p className="font-title text-xl">La temporada aún no comenzó</p>
             </div>
           )}
@@ -96,8 +105,15 @@ export default async function JugadorasPage() {
           {active.length > 0 && (
             <section className="mb-8">
               <SnakeDivider />
-              <p className="font-title text-gray-400 tracking-[0.3em] text-sm uppercase mb-3">
-                🐍 En la casa
+              <p className="font-title text-gray-400 tracking-[0.3em] text-sm uppercase mb-3 flex items-center gap-2">
+                <Image
+                  src="/logo-viboras.png"
+                  alt=""
+                  width={16}
+                  height={16}
+                  style={{ filter: 'drop-shadow(0 0 6px #D4186C88)' }}
+                />
+                En la casa
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {active.map((p, i) => <PlayerCard key={p.id} player={p} index={i} />)}

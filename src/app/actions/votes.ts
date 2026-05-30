@@ -60,7 +60,8 @@ export async function castVote(input: CastVoteInput) {
 
   if (error) {
     if (error.code === '23505') return { error: 'Ya votaste en esta votación.' }
-    return { error: 'No se pudo registrar el voto. Intentá de nuevo.' }
+    console.error('[castVote] error:', error.code, error.message)
+    return { error: `Error al registrar el voto: ${error.message}` }
   }
 
   return { success: true }
@@ -113,7 +114,7 @@ export async function castMultiVote(input: CastMultiVoteInput) {
 
   if ((count ?? 0) > 0) return { error: 'Ya votaste en esta votación.' }
 
-  // Un row por pick con su peso
+  // Un row por pick con su peso — insertamos todos de una para que sea atómico
   const rows = input.picks.map((playerId, i) => ({
     vote_session_id: input.vote_session_id,
     voter_id: user.id,
@@ -127,7 +128,14 @@ export async function castMultiVote(input: CastMultiVoteInput) {
 
   if (error) {
     if (error.code === '23505') return { error: 'Ya votaste en esta votación.' }
-    return { error: 'No se pudo registrar el voto. Intentá de nuevo.' }
+    // Si algo falló parcialmente, limpiar las filas que pudieron haber quedado
+    await supabase
+      .from('votes')
+      .delete()
+      .eq('vote_session_id', input.vote_session_id)
+      .eq('voter_id', user.id)
+    console.error('[castMultiVote] error:', error.code, error.message)
+    return { error: `Error al registrar el voto: ${error.message}` }
   }
 
   return { success: true }

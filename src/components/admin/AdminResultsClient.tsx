@@ -331,7 +331,7 @@ export function AdminResultsClient({ sessions }: Props) {
                               size="sm"
                               onClick={() => {
                                 const n = Math.min(TOP_N, res.counts.length)
-                                if (confirm(`¿Poner las top ${n} jugadoras más votadas en placa?`)) {
+                                if (confirm(`¿Poner los top ${n} jugadores más votados en placa?`)) {
                                   handleSetNominated(session.id, n)
                                 }
                               }}

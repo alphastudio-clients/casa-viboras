@@ -15,8 +15,8 @@ export default async function AdminJugadorasPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="font-title text-4xl text-white mb-1">Jugadoras</h1>
-          <p className="text-gray-600 text-sm">{players?.length ?? 0} jugadoras en total</p>
+          <h1 className="font-title text-4xl text-white mb-1">Jugadores</h1>
+          <p className="text-gray-600 text-sm">{players?.length ?? 0} jugadores en total</p>
         </div>
       </div>
 

@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import { getUser, getProfile } from '@/lib/auth/utils'
 import { Header } from '@/components/layout/Header'
@@ -51,12 +52,20 @@ export default async function VotarSessionPage({ params }: Props) {
           <Header profile={profile} />
           <main className="pt-14 px-4">
             <div className="max-w-screen-sm mx-auto py-20 text-center">
-              <span className="text-5xl block mb-4">🐍</span>
+              <div className="flex justify-center mb-4">
+                <Image
+                  src="/logo-viboras.png"
+                  alt=""
+                  width={64}
+                  height={64}
+                  style={{ filter: 'drop-shadow(0 0 20px #D4186C88)' }}
+                />
+              </div>
               <h2 className="font-title text-2xl text-white mb-2">
-                Esta votación es solo para jugadoras
+                Esta votación es solo para jugadores
               </h2>
               <p className="text-gray-500 text-sm mb-6">
-                Necesitás ingresar con la cuenta de Google vinculada a tu perfil de jugadora.
+                Necesitás ingresar con la cuenta de Google vinculada a tu perfil de jugador.
               </p>
               <a
                 href={`/login?redirectTo=/votar/${voteSessionId}`}

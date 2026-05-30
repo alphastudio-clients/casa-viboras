@@ -17,7 +17,7 @@ export default async function AdminDashboard() {
   ])
 
   const stats = [
-    { label: 'Jugadoras', value: totalPlayers ?? 0, icon: Users, color: 'text-pink' },
+    { label: 'Jugadores', value: totalPlayers ?? 0, icon: Users, color: 'text-pink' },
     { label: 'Votaciones abiertas', value: activeSessions ?? 0, icon: Vote, color: 'text-yellow-400' },
     { label: 'Votos totales', value: totalVotes ?? 0, icon: Trophy, color: 'text-green-400' },
     { label: 'Temporadas', value: totalSeasons ?? 0, icon: Calendar, color: 'text-blue-400' },

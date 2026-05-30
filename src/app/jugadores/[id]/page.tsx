@@ -62,7 +62,7 @@ export default async function PlayerProfilePage({ params }: Props) {
             className="absolute top-4 left-4 flex items-center gap-2 text-white/70 hover:text-white transition-colors"
           >
             <ArrowLeft size={18} />
-            <span className="font-title text-sm tracking-wider uppercase">Jugadoras</span>
+            <span className="font-title text-sm tracking-wider uppercase">Jugadores</span>
           </Link>
         </div>
 

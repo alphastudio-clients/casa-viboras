@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -10,7 +11,7 @@ import { cn } from '@/lib/utils'
 const NAV = [
   { href: '/admin',                  label: 'Dashboard',   icon: Home },
   { href: '/admin/temporadas',       label: 'Temporadas',  icon: Calendar },
-  { href: '/admin/jugadores',        label: 'Jugadoras',   icon: Users },
+  { href: '/admin/jugadores',        label: 'Jugadores',   icon: Users },
   { href: '/admin/votaciones',       label: 'Votaciones',  icon: Vote },
   { href: '/admin/resultados',       label: 'Resultados',  icon: BarChart2 },
   { href: '/admin/configuracion',    label: 'Config',      icon: Settings },
@@ -61,9 +62,18 @@ export function AdminNav() {
       <aside className="hidden md:flex flex-col fixed left-0 top-0 bottom-0 w-56 bg-black border-r border-gray-800/50 z-40 p-4">
         <div className="mb-6 px-3 py-2">
           <p className="font-title text-xs text-gray-700 tracking-[0.3em] uppercase mb-0.5">Admin</p>
-          <p className="font-title text-lg text-pink" style={{ textShadow: '0 0 10px #D4186C88' }}>
-            🐍 Víboras
-          </p>
+          <div className="flex items-center gap-2">
+            <Image
+              src="/logo-viboras.png"
+              alt=""
+              width={22}
+              height={22}
+              style={{ filter: 'drop-shadow(0 0 8px #D4186C88)' }}
+            />
+            <p className="font-title text-lg text-pink" style={{ textShadow: '0 0 10px #D4186C88' }}>
+              Víboras
+            </p>
+          </div>
         </div>
         <nav className="flex flex-col gap-1">
           <NavItems />
@@ -72,7 +82,16 @@ export function AdminNav() {
 
       {/* Mobile topbar */}
       <header className="md:hidden fixed top-0 left-0 right-0 z-50 h-14 bg-black border-b border-gray-800 flex items-center justify-between px-4">
-        <p className="font-title text-pink text-lg">🐍 Admin</p>
+        <div className="flex items-center gap-2">
+          <Image
+            src="/logo-viboras.png"
+            alt=""
+            width={22}
+            height={22}
+            style={{ filter: 'drop-shadow(0 0 8px #D4186C88)' }}
+          />
+          <p className="font-title text-pink text-lg">Admin</p>
+        </div>
         <button onClick={() => setOpen((v) => !v)} className="text-white">
           {open ? <X size={20} /> : <Menu size={20} />}
         </button>

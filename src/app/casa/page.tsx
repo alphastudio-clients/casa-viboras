@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import { getProfile } from '@/lib/auth/utils'
 import { Header } from '@/components/layout/Header'
@@ -205,8 +206,15 @@ export default async function CasaPage() {
           <section className="px-4 mb-8">
             <div className="max-w-screen-sm mx-auto">
               <SnakeDivider />
-              <p className="font-title text-gray-400 tracking-[0.3em] text-sm uppercase mb-4">
-                🐍 En la casa
+              <p className="font-title text-gray-400 tracking-[0.3em] text-sm uppercase mb-4 flex items-center gap-2">
+                <Image
+                  src="/logo-viboras.png"
+                  alt=""
+                  width={16}
+                  height={16}
+                  style={{ filter: 'drop-shadow(0 0 6px #D4186C88)' }}
+                />
+                En la casa
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {activePlayers
@@ -238,7 +246,15 @@ export default async function CasaPage() {
 
         {!season && (
           <div className="text-center py-20 text-gray-700">
-            <span className="text-6xl block mb-4">🐍</span>
+            <div className="flex justify-center mb-4">
+              <Image
+                src="/logo-viboras.png"
+                alt=""
+                width={72}
+                height={72}
+                style={{ filter: 'drop-shadow(0 0 24px #D4186C88)' }}
+              />
+            </div>
             <p className="font-title text-2xl">La casa está en silencio</p>
             <p className="text-sm mt-2">La temporada comenzará pronto</p>
           </div>

@@ -11,7 +11,7 @@ import type { Profile } from '@/types'
 
 const NAV_LINKS = [
   { href: '/casa',      label: 'La Casa' },
-  { href: '/jugadores', label: 'Jugadoras' },
+  { href: '/jugadores', label: 'Jugadores' },
   { href: '/votar',     label: 'Votar' },
 ]
 

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import { getProfile } from '@/lib/auth/utils'
 import { Header } from '@/components/layout/Header'
@@ -67,7 +68,7 @@ export default async function VotarPage() {
                             </Badge>
                             {session.voter_type === 'players' && (
                               <Badge variant="outline" className="text-[10px]">
-                                Solo jugadoras
+                                Solo jugadores
                               </Badge>
                             )}
                           </div>
@@ -95,7 +96,15 @@ export default async function VotarPage() {
               className="text-center py-12 rounded-sm mb-8"
               style={{ border: '1px solid #2a2a2a' }}
             >
-              <span className="text-5xl block mb-3">🐍</span>
+              <div className="flex justify-center mb-3">
+                <Image
+                  src="/logo-viboras.png"
+                  alt=""
+                  width={56}
+                  height={56}
+                  style={{ filter: 'drop-shadow(0 0 18px #D4186C88)' }}
+                />
+              </div>
               <p className="font-title text-xl text-gray-600">No hay votaciones abiertas</p>
               <p className="text-gray-700 text-sm mt-1">Volvé pronto</p>
             </div>

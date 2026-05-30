@@ -168,7 +168,7 @@ export function AdminPlayersClient({ players: initial, seasons, profiles }: Prop
 
   // ── ELIMINAR ─────────────────────────────────────────────
   async function handleDelete(playerId: string) {
-    if (!confirm('¿Eliminar esta jugadora? No se puede deshacer.')) return
+    if (!confirm('¿Eliminar este jugador? No se puede deshacer.')) return
     startTransition(async () => {
       await deletePlayer(playerId)
       setPlayers(prev => prev.filter(p => p.id !== playerId))
@@ -199,7 +199,7 @@ export function AdminPlayersClient({ players: initial, seasons, profiles }: Prop
       <div className="mb-4 flex justify-end">
         <Button onClick={() => setShowForm(v => !v)} variant="outline" size="sm" className="flex items-center gap-2">
           {showForm ? <X size={14} /> : <Plus size={14} />}
-          {showForm ? 'Cancelar' : 'Nueva jugadora'}
+          {showForm ? 'Cancelar' : 'Nuevo jugador'}
         </Button>
       </div>
 
@@ -212,7 +212,7 @@ export function AdminPlayersClient({ players: initial, seasons, profiles }: Prop
             className="mb-6 p-4 rounded-sm overflow-hidden"
             style={{ background: '#1a0a14', border: '1px solid #D4186C33' }}
           >
-            <h3 className="font-title text-lg text-white mb-4 tracking-wider">Nueva jugadora</h3>
+            <h3 className="font-title text-lg text-white mb-4 tracking-wider">Nuevo jugador</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
               <div>
                 <label className="block text-xs text-gray-600 uppercase tracking-wider mb-1">Temporada *</label>
@@ -256,7 +256,7 @@ export function AdminPlayersClient({ players: initial, seasons, profiles }: Prop
             </div>
             {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
             <div className="flex gap-3">
-              <Button type="submit" variant="pink" size="sm" loading={isPending}>Crear jugadora</Button>
+              <Button type="submit" variant="pink" size="sm" loading={isPending}>Crear jugador</Button>
               <Button type="button" variant="ghost" size="sm" onClick={resetForm}>Cancelar</Button>
             </div>
           </motion.form>
@@ -271,7 +271,7 @@ export function AdminPlayersClient({ players: initial, seasons, profiles }: Prop
       <div className="space-y-1">
         {players.length === 0 && (
           <div className="text-center py-12 text-gray-700">
-            <p className="font-title text-xl">Sin jugadoras aún</p>
+            <p className="font-title text-xl">Sin jugadores aún</p>
           </div>
         )}
 
@@ -424,19 +424,19 @@ export function AdminPlayersClient({ players: initial, seasons, profiles }: Prop
                       <textarea
                         value={editData.description}
                         onChange={e => setEditData({ ...editData, description: e.target.value })}
-                        rows={2} placeholder="Bio breve de la jugadora..."
+                        rows={2} placeholder="Bio breve del jugador..."
                         className={`${INPUT_CLS} resize-none`}
                       />
                     </div>
 
-                    {/* Vincular usuaria */}
+                    {/* Vincular cuenta */}
                     <div className="mb-4 p-3" style={{ background: '#111', border: '1px solid #2a2a2a' }}>
-                      <p className="text-xs text-gray-600 uppercase tracking-wider mb-2">Vincular cuenta de usuaria</p>
+                      <p className="text-xs text-gray-600 uppercase tracking-wider mb-2">Vincular cuenta</p>
 
                       {/* Vinculación por email (automática) */}
                       <div className="mb-3">
                         <p className="text-gray-500 text-xs mb-2">
-                          Ingresá el email de Gmail con el que la jugadora inicia sesión:
+                          Ingresá el email de Gmail con el que el jugador inicia sesión:
                         </p>
                         <div className="flex gap-2">
                           <input
@@ -444,7 +444,7 @@ export function AdminPlayersClient({ players: initial, seasons, profiles }: Prop
                             value={editingId === player.id ? emailInput : ''}
                             onChange={e => setEmailInput(e.target.value)}
                             onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleLinkByEmail(player.id))}
-                            placeholder="jugadora@gmail.com"
+                            placeholder="jugador@gmail.com"
                             className={`${INPUT_CLS} flex-1`}
                           />
                           <button

@@ -207,7 +207,7 @@ export function AdminVotacionesClient({ sessions: initial, seasons }: Props) {
                 <select value={form.voter_type} onChange={(e) => setForm({ ...form, voter_type: e.target.value as VoterType })}
                   className={INPUT_CLS}>
                   <option value="public">Público general</option>
-                  <option value="players">Solo jugadoras</option>
+                  <option value="players">Solo jugadores</option>
                 </select>
               </div>
             </div>
@@ -256,7 +256,7 @@ export function AdminVotacionesClient({ sessions: initial, seasons }: Props) {
                       <span className="text-gray-600 text-xs hidden sm:inline">{VOTE_TYPE_LABELS[s.type]}</span>
                       <span className="text-gray-700 text-xs hidden sm:inline">·</span>
                       <span className="text-gray-600 text-xs hidden sm:inline">
-                        {s.voter_type === 'public' ? 'Público' : 'Solo jugadoras'}
+                        {s.voter_type === 'public' ? 'Público' : 'Solo jugadores'}
                       </span>
                     </div>
                   </div>
@@ -480,7 +480,7 @@ export function AdminVotacionesClient({ sessions: initial, seasons }: Props) {
                             className={INPUT_CLS}
                           >
                             <option value="public" style={{ background: '#111' }}>Público general</option>
-                            <option value="players" style={{ background: '#111' }}>Solo jugadoras</option>
+                            <option value="players" style={{ background: '#111' }}>Solo jugadores</option>
                           </select>
                         </div>
                         <div className="sm:col-span-2">

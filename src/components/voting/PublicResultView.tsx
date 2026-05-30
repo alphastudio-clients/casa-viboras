@@ -139,7 +139,15 @@ export function PublicResultView({ session, winner }: Props) {
           </>
         ) : (
           <div className="py-12">
-            <span className="text-6xl block mb-4">🐍</span>
+            <div className="flex justify-center mb-4">
+              <Image
+                src="/logo-viboras.png"
+                alt=""
+                width={72}
+                height={72}
+                style={{ filter: 'drop-shadow(0 0 24px #D4186C88)' }}
+              />
+            </div>
             <p className="font-title text-xl text-gray-500">
               El resultado fue publicado
             </p>

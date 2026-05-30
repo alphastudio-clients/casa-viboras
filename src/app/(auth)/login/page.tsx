@@ -153,7 +153,7 @@ function LoginCard() {
           {/* Separador */}
           <div className="flex items-center gap-3 my-1">
             <div className="flex-1 h-px bg-gray-800" />
-            <span className="text-gray-700 text-xs uppercase tracking-wider">Si sos jugadora</span>
+            <span className="text-gray-700 text-xs uppercase tracking-wider">Si sos jugador/a</span>
             <div className="flex-1 h-px bg-gray-800" />
           </div>
 

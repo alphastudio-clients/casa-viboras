@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import type { Profile } from '@/types'
 
@@ -35,17 +35,21 @@ export async function requireAdmin() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single()
+  // Usar admin client para bypassear RLS en ambas tablas
+  const adminClient = await createAdminClient()
 
-  const { data: adminUser } = await supabase
-    .from('admin_users')
-    .select('id')
-    .eq('email', user.email ?? '')
-    .single()
+  const [{ data: profile }, { data: adminUser }] = await Promise.all([
+    adminClient
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single(),
+    adminClient
+      .from('admin_users')
+      .select('id')
+      .eq('email', user.email ?? '')
+      .single(),
+  ])
 
   if (profile?.role !== 'admin' && !adminUser) {
     redirect('/')

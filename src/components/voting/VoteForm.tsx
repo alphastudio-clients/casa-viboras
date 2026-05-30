@@ -66,7 +66,7 @@ export function VoteForm({ session, players, profile, hasVoted: initialHasVoted 
 
       if (isMulti) {
         if (picks.length !== weights.length) {
-          setError(`Tenés que elegir exactamente ${weights.length} jugadoras.`)
+          setError(`Tenés que elegir exactamente ${weights.length} jugadores.`)
           return
         }
         result = await castMultiVote({
@@ -226,7 +226,7 @@ export function VoteForm({ session, players, profile, hasVoted: initialHasVoted 
         {/* Lista de jugadoras */}
         {players.length === 0 ? (
           <div className="text-center py-12 text-gray-600">
-            <p className="font-title text-xl">No hay jugadoras disponibles</p>
+            <p className="font-title text-xl">No hay jugadores disponibles</p>
           </div>
         ) : (
           <div className="space-y-2 mb-6">
@@ -265,7 +265,7 @@ export function VoteForm({ session, players, profile, hasVoted: initialHasVoted 
                 onChange={(e) => setReason(e.target.value)}
                 maxLength={300}
                 rows={3}
-                placeholder="¿Por qué elegís a esta jugadora?"
+                placeholder="¿Por qué elegís a este jugador?"
                 className="w-full bg-gray-900 border border-gray-700 text-white text-sm p-3 rounded-sm resize-none focus:outline-none focus:border-pink/60 placeholder:text-gray-700"
                 disabled={isPending}
               />
@@ -318,7 +318,7 @@ export function VoteForm({ session, players, profile, hasVoted: initialHasVoted 
 
       {players.length === 0 ? (
         <div className="text-center py-12 text-gray-600">
-          <p className="font-title text-xl">No hay jugadoras disponibles</p>
+          <p className="font-title text-xl">No hay jugadores disponibles</p>
         </div>
       ) : (
         <div className="space-y-2 mb-6">
@@ -351,7 +351,7 @@ export function VoteForm({ session, players, profile, hasVoted: initialHasVoted 
               onChange={(e) => setReason(e.target.value)}
               maxLength={300}
               rows={3}
-              placeholder="¿Por qué elegís a esta jugadora?"
+              placeholder="¿Por qué elegís a este jugador?"
               className="w-full bg-gray-900 border border-gray-700 text-white text-sm p-3 rounded-sm resize-none focus:outline-none focus:border-pink/60 placeholder:text-gray-700"
               disabled={isPending}
             />

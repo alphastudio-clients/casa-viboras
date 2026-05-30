@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { ClawMarks } from '@/components/ui/GlowText'
 
 interface RevealAnimationProps {
@@ -90,7 +91,13 @@ export function RevealAnimation({ playerName, onComplete }: RevealAnimationProps
                 }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
               >
-                <span className="text-5xl">🐍</span>
+                <Image
+                  src="/logo-viboras.png"
+                  alt=""
+                  width={80}
+                  height={80}
+                  style={{ filter: 'drop-shadow(0 0 20px #D4186C88)' }}
+                />
               </motion.div>
             </motion.div>
           )}
@@ -197,13 +204,18 @@ export function RevealAnimation({ playerName, onComplete }: RevealAnimationProps
                 ABANDONA LA CASA
               </motion.p>
 
-              <motion.span
-                className="text-5xl"
+              <motion.div
                 animate={{ rotate: [0, 12, -12, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
-                🐍
-              </motion.span>
+                <Image
+                  src="/logo-viboras.png"
+                  alt=""
+                  width={60}
+                  height={60}
+                  style={{ filter: 'drop-shadow(0 0 20px #D4186C)' }}
+                />
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
